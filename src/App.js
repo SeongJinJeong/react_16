@@ -3,17 +3,42 @@ import {createPortal} from 'react-dom';
 import logo from './logo.svg';
 import './App.css';
 
+const boundaryHOC = (protectedComponents) => class boundary extends Component {
+  state = {
+    hasError : false,
+  }
+
+  componentDidCatch=(err,info)=>{
+    this.setState({hasError:true});
+    console.log(`Error is : ${err} , Info is : ${JSON.stringify(info)}`)
+  };
+
+  render(){
+    const { hasError } = this.state;
+      if(hasError){
+        return <ErrorFallBack />
+      }else{
+        return <ErrorMaker />
+      }
+  }
+}
+// HOC 
+
 class Portals extends Component {
   render(){
     return createPortal(<Message />,document.getElementById("touchme"))
   }
 }
 
+const pPortals = boundaryHOC(Portals);
+
 const Message = () =>{
   return(
     "Touched You!"
   )
 }
+
+
 
 class ErrorMaker extends Component{
   state ={
@@ -31,30 +56,20 @@ class ErrorMaker extends Component{
     return friends.map(friend => ` ${friend} `);
   }
 }
+const pErrorMaker = boundaryHOC(ErrorMaker);
 
 const ErrorFallBack = () => "Something Went Wrong ...."
 
 class App extends Component {
 
-  state={
-    hasError : false,
-  }
-
-  componentDidCatch = (error,info) =>{
-    this.setState({hasError:true});
-
-    console.log(`Error is : ${error}, Info is : ${JSON.stringify(info)} `)
-  }
-
   render(){
-    const {hasError} = this.state;
     return (
       <div className="App">
-        <Portals />
-        {hasError ? <ErrorFallBack /> : <ErrorMaker />}
+        <pPortals />
+        <pErrorMaker />
       </div>
     );
   }
 }
 
-export default App;
+export default boundaryHOC(App);

@@ -60,16 +60,46 @@ const pErrorMaker = boundaryHOC(ErrorMaker);
 
 const ErrorFallBack = () => "Something Went Wrong ...."
 
+const MAX_PIZZA = 20;
+
+const pizzaUp = (state,props) =>{
+  const { pizzas } = state;
+  if(pizzas < 20){
+    return {
+      pizzas : pizzas+1
+    }
+  }else{
+    return null;
+  }
+}
+
+class Controlled extends Component {
+  state = {
+    pizzas: 0
+  }
+
+  render(){
+    const { pizzas } = this.state;
+    return(
+      <button onClick={this._clickHandler}>{`I have eaten ${pizzas} ${pizzas === 0 || 1? "pizza" : "pizzas"}`}</button>
+    )
+  }
+
+  _clickHandler = () =>{
+    this.setState(pizzaUp);
+  }
+}
+
 class App extends Component {
 
   render(){
     return (
       <div className="App">
         <pPortals />
-        <pErrorMaker />
+        <Controlled />
       </div>
     );
   }
 }
 
-export default boundaryHOC(App);
+export default App;
